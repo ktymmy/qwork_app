@@ -1,28 +1,43 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '.././const/uri.dart';
 
 Future<void> postDataToServer(
     int empId, String fName, String gName, String pass) async {
   try {
-    final Uri url = Uri.parse('http://localhost:1323/addemployee');
+    var response = await http.post(
+      uri().addemployee,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'emp_id': empId,
+        'f_name': fName,
+        'g_name': gName,
+        'pass': pass,
+      }),
+    );
 
-    var request = http.MultipartRequest('POST', url)
-      ..fields['emp_id'] = empId.toString()
-      ..fields['f_name'] = fName
-      ..fields['g_name'] = gName
-      ..fields['pass'] = pass;
-
-    var response = await request.send();
-
-    var responseData = await http.Response.fromStream(response);
-    var responseBody = jsonDecode(responseData.body);
+    var responseBody = jsonDecode(response.body);
 
     if (response.statusCode == 201) {
-      print('成功: ${responseBody}');
+      Future<bool> checkEmpId(int empId) async {
+        final response = await http
+            .get(Uri.parse('http://localhost:1323/checkempid?emp_id=$empId'));
+        if (response.statusCode == 200) {
+          return true;
+        } else if (response.statusCode == 409) {
+          return false;
+        } else {
+          throw Exception('従業員IDチェックに失敗しました');
+        }
+      }
+
+      print('成功！！！！: ${responseBody}');
     } else if (response.statusCode == 400) {
       print('クライアントエラー: ${responseBody['message']}');
     } else if (response.statusCode == 409) {
-      print('競合: ${responseBody['message']}');
+      return print('重複！！！: ${responseBody['message']}');
     } else {
       print('エラー: サーバーが ${response.statusCode} ステータスコードを返しました。');
       print('レスポンス内容: ${responseBody['message']}');
@@ -31,3 +46,17 @@ Future<void> postDataToServer(
     print('エラー!!!!!!!!: $error');
   }
 }
+
+// class EmpDatabase {
+//   Future<bool> checkEmpId(int empId) async {
+//     final response = await http
+//         .get(Uri.parse('http://localhost:1323/checkempid?emp_id=$empId'));
+//     if (response.statusCode == 200) {
+//       return true;
+//     } else if (response.statusCode == 409) {
+//       return false;
+//     } else {
+//       throw Exception('従業員IDチェックに失敗しました');
+//     }
+//   }
+// }
