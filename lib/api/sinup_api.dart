@@ -6,7 +6,7 @@ Future<void> postDataToServer(
     int empId, String fName, String gName, String pass) async {
   try {
     var response = await http.post(
-      uri().addemployee,
+      UriConst().addemployee,
       headers: {
         'Content-Type': 'application/json',
       },
@@ -21,18 +21,6 @@ Future<void> postDataToServer(
     var responseBody = jsonDecode(response.body);
 
     if (response.statusCode == 201) {
-      Future<bool> checkEmpId(int empId) async {
-        final response = await http
-            .get(Uri.parse('http://localhost:1323/checkempid?emp_id=$empId'));
-        if (response.statusCode == 200) {
-          return true;
-        } else if (response.statusCode == 409) {
-          return false;
-        } else {
-          throw Exception('従業員IDチェックに失敗しました');
-        }
-      }
-
       print('成功！！！！: ${responseBody}');
     } else if (response.statusCode == 400) {
       print('クライアントエラー: ${responseBody['message']}');
@@ -46,17 +34,3 @@ Future<void> postDataToServer(
     print('エラー!!!!!!!!: $error');
   }
 }
-
-// class EmpDatabase {
-//   Future<bool> checkEmpId(int empId) async {
-//     final response = await http
-//         .get(Uri.parse('http://localhost:1323/checkempid?emp_id=$empId'));
-//     if (response.statusCode == 200) {
-//       return true;
-//     } else if (response.statusCode == 409) {
-//       return false;
-//     } else {
-//       throw Exception('従業員IDチェックに失敗しました');
-//     }
-//   }
-// }

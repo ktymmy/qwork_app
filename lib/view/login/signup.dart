@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import '../../const/color.dart';
 import '../../const/image.dart';
 import '../../database/emp_database.dart';
-import 'Confirmation.dart';
-import '../../api/sinup_api.dart';
+import 'confirmation.dart';
+import '../../api/empid_api.dart';
+import './validator.dart';
 
 class SignUp extends StatefulWidget {
   const SignUp({super.key});
@@ -18,13 +19,12 @@ class SignUpState extends State<SignUp> {
   final TextEditingController _gNameController = TextEditingController();
   final TextEditingController _empIdController = TextEditingController();
   final TextEditingController _passController = TextEditingController();
-  final TextEditingController _passCheck = TextEditingController();
-  // final EmpDatabase _empDatabase = EmpDatabase();
+  final TextEditingController _passCheckController = TextEditingController();
 
-  // パスワードの目のicon分岐
   bool _isObscurePass = true;
   bool _isObscureCheck = true;
-  String? _empIdError;
+  bool? isIdCheck;
+  // bpp? _empIdError;
 
   @override
   Widget build(BuildContext context) {
@@ -56,14 +56,34 @@ class SignUpState extends State<SignUp> {
                         labelText: '従業員番号',
                         keyboardType: TextInputType.number,
                         isId: true,
+                        suffixIcon: isIdCheck == true
+                            ? Icon(
+                                Icons.check_circle,
+                                color: Colors.green,
+                              )
+                            : null,
+                        onChanged: (value) async {
+                          isIdCheck = await validateEmpId(value);
+                          print("isIdCheck = $isIdCheck");
+
+                          setState(() {});
+                        },
                       ),
+                      Container(),
+                      if (isIdCheck == false)
+                        Align(
+                          alignment: Alignment.bottomLeft,
+                          child: Text(
+                            "既に使用されているIDです",
+                            style: TextStyle(color: Colors.red, fontSize: 10),
+                          ),
+                        ),
                       const SizedBox(height: 25),
                       customTextFormField(
                         controller: _passController,
                         labelText: 'パスワード',
                         isPassword: true,
                         obscureText: _isObscurePass,
-                        keyboardType: TextInputType.visiblePassword,
                         suffixIcon: IconButton(
                           icon: Icon(
                             _isObscurePass
@@ -81,11 +101,10 @@ class SignUpState extends State<SignUp> {
                         ),
                       ),
                       customTextFormField(
-                        controller: _passCheck,
+                        controller: _passCheckController,
                         labelText: 'パスワード再入力',
                         isPassword: true,
                         obscureText: _isObscureCheck,
-                        keyboardType: TextInputType.visiblePassword,
                         suffixIcon: IconButton(
                           icon: Icon(
                             _isObscureCheck
@@ -106,7 +125,7 @@ class SignUpState extends State<SignUp> {
                       ElevatedButton(
                         onPressed: () async {
                           if (_signUpKey.currentState!.validate()) {
-                            if (_empIdError == null) {
+                            if (isIdCheck == true) {
                               final empId = int.parse(_empIdController.text);
                               final fName = _fNameController.text;
                               final gName = _gNameController.text;
@@ -123,10 +142,6 @@ class SignUpState extends State<SignUp> {
                                 MaterialPageRoute(
                                     builder: (context) =>
                                         Confirmation(postModel)),
-                              );
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(_empIdError!)),
                               );
                             }
                           }
@@ -167,13 +182,11 @@ class SignUpState extends State<SignUp> {
     return SizedBox(
       width: 272,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Align(
-            alignment: Alignment(-1, 0),
-            child: Text(
-              labelText,
-              style: const TextStyle(color: SignUpColor.labelText),
-            ),
+          Text(
+            labelText,
+            style: const TextStyle(color: SignUpColor.labelText),
           ),
           TextFormField(
             controller: controller,
@@ -193,24 +206,12 @@ class SignUpState extends State<SignUp> {
               if (value == null || value.isEmpty) {
                 return '入力してください';
               }
-              // Futureif(isId) async {
-              //   final isAvailable = await _empDatabase
-              //       .checkEmpId(int.parse(_empIdController.text));
-
-              //   if (isAvailable) {
-              //     return null;
-              //   } else {
-              //     return 'この従業員番号は既に使用されています';
-              //   }
-              // }
 
               if (isPassword) {
-                if (_passCheck.text != _passController.text &&
-                    value.length <= 8) {
-                  return '一致していません・文字数が足りません';
-                } else if (_passCheck.text != _passController.text) {
-                  return "一致しません";
-                } else if (value.length <= 8) {
+                if (_passCheckController.text != _passController.text) {
+                  return 'パスワードが一致しません';
+                }
+                if (value.length < 8) {
                   return '文字数が足りません';
                 }
               }
