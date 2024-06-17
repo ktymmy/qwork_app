@@ -26,13 +26,13 @@ class Confirmation extends StatelessWidget {
                 const SizedBox(height: 60),
                 ElevatedButton(
                   onPressed: () async {
+                    await postDataToServer(
+                      int.parse(post.empId.toString()),
+                      post.fName,
+                      post.gName,
+                      post.pass,
+                    );
                     try {
-                      await postDataToServer(
-                        int.parse(post.empId.toString()),
-                        post.fName,
-                        post.gName,
-                        post.pass,
-                      );
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('新規登録が成功しました')),
                       );
