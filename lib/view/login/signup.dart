@@ -4,7 +4,6 @@ import '../../const/image.dart';
 import '../../database/emp_database.dart';
 import 'confirmation.dart';
 import '../../api/empid_api.dart';
-import './validator.dart';
 
 class SignUp extends StatefulWidget {
   const SignUp({super.key});
