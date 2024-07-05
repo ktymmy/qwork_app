@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../../const/color.dart';
 import '../../const/image.dart';
 import './signup.dart';
+import '../home/home.dart';
 
 class SignIn extends StatefulWidget {
   const SignIn({super.key});
@@ -19,13 +20,13 @@ class SignInState extends State<SignIn> {
   final TextEditingController _passController = TextEditingController();
 
 //パスワードの目のicon分岐
-  bool _isObscurePass = true;
-  bool _isObscureCheck = true;
+  // bool _isObscure Pass = true;
+  // bool _isObscureCheck = true;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ColorConst.main,
+      backgroundColor: SignInColor.bk,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -67,11 +68,10 @@ class SignInState extends State<SignIn> {
 
                         //   pass: pass,
                         // );
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //       builder: (context) => Confirmation(postModel)),
-                        // );
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => Home()),
+                        );
                       }
                     },
                     child: Text(

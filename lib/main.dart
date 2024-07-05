@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '././view/home/home.dart';
+import './view/home/UpSheet.dart';
 import './view/login/signin.dart';
 
 void main() {
@@ -7,10 +9,11 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(debugShowCheckedModeBanner: false, home: SignIn());
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: SignIn(),
+    );
   }
 }
